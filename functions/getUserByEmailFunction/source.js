@@ -8,7 +8,26 @@ exports = async function(arg) {
 
   var usersCollection = context.services.get("mongodb-atlas").db("sample_mflix").collection("users");
   
-  const query = { "email": arg };
+  const query = {
+      "email": arg
+  };
+
+  const update = {
+      $set : {
+          lastAccessed: new Date()
+      }
+  };
+
+  await usersCollection.updateOne(query,update)
+      .then(result => {
+          const {matchedCount, modifiedCount} = result;
+          if(matchedCount && modifiedCount) {
+              console.log(`Successfully updated lastAccessedDate`);
+          }
+      })
+      .catch(err => {
+          console.error(`Failed to update lastAccessedDate: ${err}`);
+      })
 
   return usersCollection.findOne(query)
     .then(result => {
